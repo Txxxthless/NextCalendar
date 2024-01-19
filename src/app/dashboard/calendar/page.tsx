@@ -1,9 +1,10 @@
 import Calendar from "@/app/components/calendar/calendar";
+import './style.scss';
 
 export default function Page() {
   return (
     <>
-      <p>Calendar</p>
+      <p className="title">Calendar</p>
       <Calendar></Calendar>
     </>
   );

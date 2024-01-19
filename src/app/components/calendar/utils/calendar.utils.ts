@@ -5,28 +5,28 @@ export interface CalendarCell {
 }
 
 export const DAYS_COUNT = 7;
-export const PERIODS_COUNT = 48;
+export const PERIODS_COUNT = 47;
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function generateCalendar() {
   let calendarDays: CalendarCell[][] = [];
-  
+
   const date = getZeroDate();
   date.setDate(date.getDate() - date.getDay());
-  
+
   for (let i = 0; i < DAYS_COUNT; i++) {
     const day = [];
 
     for (let j = 0; j < PERIODS_COUNT; j++) {
-        const start = date.toISOString();
-        date.setMinutes(date.getMinutes() + 30);
-        const end = date.toISOString();
-        day[j] = {
-            start: start,
-            end: end,
-            event: false,
-        };
+      const start = date.toISOString();
+      date.setMinutes(date.getMinutes() + 30);
+      const end = date.toISOString();
+      day[j] = {
+        start: start,
+        end: end,
+        event: false,
+      };
     }
 
     calendarDays = [...calendarDays, day];
@@ -47,6 +47,7 @@ export function getTimePeriods(): string[] {
     }
   }
 
+  timePeriods.shift();
   return timePeriods;
 }
 
