@@ -15,20 +15,26 @@ export default function Calendar() {
   return (
     <div className="calendar">
       <div className="calendar__header">
-        {calendarHeaders.map((header) => (
-          <div className="calendar__header__cell">{header}</div>
+        {calendarHeaders.map((header, index) => (
+          <div className="calendar__header__cell" key={index}>
+            {header}
+          </div>
         ))}
       </div>
       <div className="calendar__main">
         <div className="calendar__main__periods">
-          {timePeriods.map((period) => (
-            <div className="calendar__main__periods__cell">{period}</div>
+          {timePeriods.map((period, index) => (
+            <div className="calendar__main__periods__cell" key={index}>
+              {period}
+            </div>
           ))}
         </div>
-        {calendar.map((day) => (
-          <div className="calendar__main__day">
+        {calendar.map((day, index) => (
+          <div className="calendar__main__day" key={index}>
             {day.map((cell, index) => (
-              <div className="calendar__main__day__cell">{index}</div>
+              <div className="calendar__main__day__cell" key={index}>
+                {index}
+              </div>
             ))}
           </div>
         ))}
