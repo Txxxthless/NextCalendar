@@ -27,10 +27,11 @@ export default function SideBar() {
     <div className="sidebar">
       <span className="sidebar__title">Calendary</span>
       <div className="sidebar__nav">
-        {navLinks.map((link) => {
+        {navLinks.map((link, index) => {
           return (
             <Link
               href={link.href}
+              key={index}
               className={pathname === link.href ? 'active' : ''}
             >
               {link.title}
