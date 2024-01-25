@@ -1,5 +1,6 @@
 'use client';
 
+import Event from './event';
 import './style.scss';
 import {
   generateCalendar,
@@ -25,15 +26,20 @@ export default function Calendar() {
         <div className="calendar__main__periods">
           {timePeriods.map((period, index) => (
             <div className="calendar__main__periods__cell" key={index}>
-              {period}
+              {index % 2 !== 0 ? period : ''}
             </div>
           ))}
         </div>
         {calendar.map((day, index) => (
           <div className="calendar__main__day" key={index}>
             {day.map((cell, index) => (
-              <div className="calendar__main__day__cell" key={index}>
-                {index}
+              <div
+                className="calendar__main__day__cell"
+                key={index}
+                onClick={() => console.log(cell.start, cell.end)}
+                style={cell.event ? { border: 'none' } : {}}
+              >
+                {cell.event ? <Event cell={cell}></Event> : ''}
               </div>
             ))}
           </div>

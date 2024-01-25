@@ -53,6 +53,7 @@
       flex-direction: column;
 
       &__cell {
+        position: relative;
         min-height: 40px;
         display: flex;
         align-items: center;
@@ -61,12 +62,37 @@
         transition: 0.5s;
 
         &:hover {
-          background: linear-gradient(
-            180deg,
-            #b5bff7 0%,
-            rgba(190, 181, 247, 0.99) 50%,
-            rgba(205, 98, 255, 0.63) 100%
-          );
+          background: #ffeded;
+        }
+
+        .event {
+          position: absolute;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #98daff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+
+          &.start {
+            border-radius: 5px 5px 0 0;
+            z-index: 100;
+          }
+
+          &.single {
+            border-radius: 5px;
+            z-index: 100;
+          }
+
+          &.middle {
+            border-radius: 0;
+          }
+
+          &.end {
+            border-radius: 0 0 5px 5px;
+          }
         }
       }
 
