@@ -16,6 +16,16 @@ export const events: CalendarEvent[] = [
     end: '2024-01-27T12:35:00.000Z',
     name: 'Event 3',
   },
+  {
+    start: '2024-01-16T08:30:00.000Z',
+    end: '2024-01-16T10:00:00.000Z',
+    name: 'Event 2',
+  },
+  {
+    start: '2024-02-01T09:21:00.000Z',
+    end: '2024-02-01T12:35:00.000Z',
+    name: 'Event 3',
+  },
 ];
 
 export const DAYS_COUNT = 7;
@@ -23,11 +33,8 @@ export const PERIODS_COUNT = 48;
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export function generateCalendar() {
+export function generateCalendar(date: Date) {
   let calendarDays: CalendarCell[][] = [];
-
-  const date = getZeroDate();
-  date.setDate(date.getDate() - date.getDay());
 
   for (let i = 0; i < DAYS_COUNT; i++) {
     const day = [];
@@ -68,13 +75,12 @@ export function getTimePeriods(): string[] {
   return [...timePeriods, '24:00'];
 }
 
-export function getCalendarHeaders(): string[] {
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() - currentDate.getDay() - 1);
+export function getCalendarHeaders(date: Date): string[] {
+  date.setDate(date.getDate() - 1);
 
   return dayNames.map((dayName) => {
-    currentDate.setDate(currentDate.getDate() + 1);
-    return `${dayName}, ${currentDate.getDate()}`;
+    date.setDate(date.getDate() + 1);
+    return `${dayName}, ${date.getDate()}`;
   });
 }
 
@@ -112,4 +118,10 @@ export function findRelatedEvent(
   }
 
   return null;
+}
+
+export function getStartDate() {
+  const date = getZeroDate();
+  date.setDate(date.getDate() - date.getDay());
+  return date;
 }

@@ -5,17 +5,50 @@ import './style.scss';
 import {
   generateCalendar,
   getCalendarHeaders,
+  getStartDate,
   getTimePeriods,
 } from './utils/calendar.utils';
+import Image from 'next/image';
+
+import arrowRight from '../../../../public/icons/arrow.svg';
+import { useState } from 'react';
 
 export default function Calendar() {
-  const calendar = generateCalendar();
+  const [startDate, setStartDate] = useState(getStartDate().toISOString());
+  const [calendar, setCalendar] = useState(
+    generateCalendar(new Date(startDate))
+  );
   const timePeriods = getTimePeriods();
-  const calendarHeaders = getCalendarHeaders();
+  const [calendarHeaders, setCalendarHeaders] = useState(
+    getCalendarHeaders(new Date(startDate))
+  );
+
+  const moveDate = (move: number) => {
+    const nextDate = new Date(startDate);
+    nextDate.setDate(nextDate.getDate() + move);
+    const isoString = nextDate.toISOString();
+    setStartDate(isoString);
+    const newCalendar = generateCalendar(new Date(isoString));
+    setCalendar(newCalendar);
+    const newHeaders = getCalendarHeaders(new Date(isoString));
+    setCalendarHeaders(newHeaders);
+  };
 
   return (
     <div className="calendar">
       <div className="calendar__header">
+        <div
+          className="calendar__header__cell arrow-left"
+          onClick={() => moveDate(-7)}
+        >
+          <Image src={arrowRight} alt="right" />
+        </div>
+        <div
+          className="calendar__header__cell arrow-right"
+          onClick={() => moveDate(7)}
+        >
+          <Image src={arrowRight} alt="right" />
+        </div>
         {calendarHeaders.map((header, index) => (
           <div className="calendar__header__cell" key={index}>
             {header}

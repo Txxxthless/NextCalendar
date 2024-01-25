@@ -1,4 +1,4 @@
-@import 'src/public/styles/constants/index.scss';
+@import '/public/styles/constants/index.scss';
 
 .calendar {
   display: flex;
@@ -19,6 +19,17 @@
       align-items: center;
       justify-content: center;
       background-color: $light-grey;
+
+      &.arrow-right,
+      &.arrow-left {
+        width: 3.1%;
+        background: white;
+        cursor: pointer;
+      }
+
+      &.arrow-left img {
+        transform: rotate(180deg);
+      }
     }
   }
 

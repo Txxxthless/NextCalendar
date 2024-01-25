@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import '../public/styles/globals.scss';
+import '../../public/styles/globals.scss';
 import { defaultFont } from '../lib/fonts';
 
 export const metadata: Metadata = {
