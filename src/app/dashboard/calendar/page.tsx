@@ -4,7 +4,7 @@ import './style.scss';
 export default function Page() {
   return (
     <>
-      <p className="title">Calendar</p>
+      <p className="page-title">Calendar</p>
       <Calendar></Calendar>
     </>
   );
