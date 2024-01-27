@@ -70,7 +70,7 @@
         align-items: center;
         justify-content: center;
         background: white;
-        transition: 0.5s;
+        transition: background 0.5s;
 
         &:hover {
           background: #ffeded;
@@ -109,6 +109,19 @@
 
       :nth-child(even) {
         border-bottom: 1px solid $light-grey;
+      }
+    }
+  }
+
+  .modal {
+    .hour-input {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      input {
+        width: 74px;
       }
     }
   }

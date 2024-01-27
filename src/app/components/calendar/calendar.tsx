@@ -11,27 +11,69 @@ import {
 import Image from 'next/image';
 
 import arrowRight from '../../../../public/icons/arrow.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { CalendarCell, CalendarEvent } from '@/interface/calendar.interface';
+import CreateEventForm, { State } from './create-event-form';
+import { z } from 'zod';
+
+const numberValidator = (min: number, max: number) => {
+  return z.preprocess(
+    (a: unknown) => parseInt(a as string, 10),
+    z.number().min(min).max(max)
+  );
+};
+
+const createEventSchema = z.object({
+  name: z.string(),
+  startHour: numberValidator(0, 24),
+  startMinute: numberValidator(0, 59),
+  endHour: numberValidator(0, 24),
+  endMinute: numberValidator(0, 59),
+});
 
 export default function Calendar() {
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  const [cell, setCell] = useState<CalendarCell>({
+    start: '',
+    end: '',
+    event: null,
+  });
+
   const [startDate, setStartDate] = useState(getStartDate().toISOString());
   const [calendar, setCalendar] = useState(
-    generateCalendar(new Date(startDate))
+    generateCalendar(new Date(startDate), events)
   );
   const timePeriods = getTimePeriods();
   const [calendarHeaders, setCalendarHeaders] = useState(
     getCalendarHeaders(new Date(startDate))
   );
 
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    const calendar = generateCalendar(new Date(startDate), events);
+    const calendarHeaders = getCalendarHeaders(new Date(startDate));
+    setCalendarHeaders(calendarHeaders);
+    setCalendar(calendar);
+  }, [events, startDate]);
+
   const moveDate = (move: number) => {
     const nextDate = new Date(startDate);
     nextDate.setDate(nextDate.getDate() + move);
+
     const isoString = nextDate.toISOString();
     setStartDate(isoString);
-    const newCalendar = generateCalendar(new Date(isoString));
-    setCalendar(newCalendar);
-    const newHeaders = getCalendarHeaders(new Date(isoString));
-    setCalendarHeaders(newHeaders);
+  };
+
+  const modalClose = () => {
+    setModalOpen(false);
+  };
+
+  const modalOpen = (cell: CalendarCell) => {
+    console.log(cell.start, cell.end);
+    setCell(cell);
+    setModalOpen(true);
   };
 
   return (
@@ -69,14 +111,67 @@ export default function Calendar() {
               <div
                 className="calendar__main__day__cell"
                 key={index}
-                onClick={() => console.log(cell.start, cell.end)}
+                onClick={() => modalOpen(cell)}
                 style={cell.event ? { border: 'none' } : {}}
               >
-                {cell.event ? <Event cell={cell}></Event> : ''}
+                {cell.event ? <Event cell={cell} /> : ''}
               </div>
             ))}
           </div>
         ))}
+      </div>
+      {isModalOpen && (
+        <CreateEventModal
+          close={modalClose}
+          submit={(state: State, formData: FormData) => {
+            const validatedFields = createEventSchema.safeParse({
+              name: formData.get('name'),
+              startHour: formData.get('startHour'),
+              startMinute: formData.get('startMinute'),
+              endHour: formData.get('endHour'),
+              endMinute: formData.get('endMinute'),
+            });
+
+            if (validatedFields.success) {
+              const { name, startHour, startMinute, endHour, endMinute } =
+                validatedFields.data;
+              const start = new Date(cell.start);
+              start.setHours(startHour);
+              start.setMinutes(startMinute);
+              const end = new Date(cell.start);
+              end.setHours(endHour);
+              end.setMinutes(endMinute);
+
+              setEvents([
+                ...events,
+                {
+                  name: name,
+                  start: start.toISOString(),
+                  end: end.toISOString(),
+                },
+              ]);
+              return { message: 'Success' };
+            }
+            return { message: 'The input is incorrect' };
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function CreateEventModal({
+  close,
+  submit,
+}: {
+  close: () => void;
+  submit: (prevState: State, next: FormData) => State;
+}) {
+  return (
+    <div className="modal-overlay" onClick={close}>
+      <div className="modal" onClick={(event) => event.stopPropagation()}>
+        <p>Create new event</p>
+        <CreateEventForm submit={submit} />
       </div>
     </div>
   );
