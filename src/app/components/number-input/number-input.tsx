@@ -31,6 +31,11 @@ export default function NumberInput({
   };
 
   return (
-    <input onChange={onChange} name={name} placeholder={placeholder}></input>
+    <input
+      onChange={onChange}
+      name={name}
+      placeholder={placeholder}
+      autoComplete="off"
+    ></input>
   );
 }

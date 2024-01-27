@@ -14,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={defaultFont.className}>{children}</body>
+      <body className={defaultFont.className}>
+        {children}
+        <div className="overlay"></div>
+      </body>
     </html>
   );
 }

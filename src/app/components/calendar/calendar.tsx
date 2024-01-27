@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { CalendarCell, CalendarEvent } from '@/interface/calendar.interface';
 import CreateEventForm, { State } from './create-event-form';
 import { z } from 'zod';
+import Modal from '../modal/modal';
 
 const numberValidator = (min: number, max: number) => {
   return z.preprocess(
@@ -68,10 +69,6 @@ export default function Calendar() {
     setStartDate(isoString);
   };
 
-  const modalClose = () => {
-    setModalOpen(false);
-  };
-
   const modalOpen = (cell: CalendarCell) => {
     console.log(cell.start, cell.end);
     setCell(cell);
@@ -122,9 +119,9 @@ export default function Calendar() {
           </div>
         ))}
       </div>
-      {isModalOpen && (
-        <CreateEventModal
-          close={modalClose}
+      <Modal isOpen={isModalOpen} close={() => setModalOpen(false)}>
+        <p>Create new event</p>
+        <CreateEventForm
           submit={(state: State, formData: FormData) => {
             const validatedFields = createEventSchema.safeParse({
               name: formData.get('name'),
@@ -153,30 +150,13 @@ export default function Calendar() {
                 },
               ]);
 
-              modalClose();
+              setModalOpen(false);
               return { message: '' };
             }
             return { message: 'The input is incorrect' };
           }}
         />
-      )}
-    </div>
-  );
-}
-
-function CreateEventModal({
-  close,
-  submit,
-}: {
-  close: () => void;
-  submit: (prevState: State, next: FormData) => State;
-}) {
-  return (
-    <div className="modal-overlay" onClick={close}>
-      <div className="modal" onClick={(event) => event.stopPropagation()}>
-        <p>Create new event</p>
-        <CreateEventForm submit={submit} />
-      </div>
+      </Modal>
     </div>
   );
 }
