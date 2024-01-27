@@ -23,13 +23,15 @@ const numberValidator = (min: number, max: number) => {
   );
 };
 
-const createEventSchema = z.object({
-  name: z.string(),
-  startHour: numberValidator(0, 24),
-  startMinute: numberValidator(0, 59),
-  endHour: numberValidator(0, 24),
-  endMinute: numberValidator(0, 59),
-});
+const createEventSchema = z
+  .object({
+    name: z.string(),
+    startHour: numberValidator(0, 24),
+    startMinute: numberValidator(0, 59),
+    endHour: numberValidator(0, 24),
+    endMinute: numberValidator(0, 59),
+  })
+  .refine((schema) => schema.startHour < schema.endHour);
 
 export default function Calendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -150,7 +152,9 @@ export default function Calendar() {
                   end: end.toISOString(),
                 },
               ]);
-              return { message: 'Success' };
+
+              modalClose();
+              return { message: '' };
             }
             return { message: 'The input is incorrect' };
           }}
