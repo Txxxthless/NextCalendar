@@ -11,8 +11,6 @@ export default function Modal({
   children: ReactNode;
   close: () => void;
 }) {
-  const modalOverlay = document.querySelector('.overlay') as Element;
-
   return (
     <>
       {isOpen &&
@@ -22,7 +20,7 @@ export default function Modal({
               {children}
             </div>
           </div>,
-          modalOverlay
+          document.querySelector('.overlay') as Element
         )}
     </>
   );
