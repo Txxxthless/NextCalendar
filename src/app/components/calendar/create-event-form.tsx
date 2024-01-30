@@ -2,18 +2,29 @@
 
 import { useFormState } from 'react-dom';
 import NumberInput from '../number-input/number-input';
+import { createEvent } from '@/app/actions/calendar.actions';
+import { CalendarCell } from '@/interface/calendar.interface';
+import { useEffect } from 'react';
 
 export interface State {
   message?: string | null;
 }
 
 export default function CreateEventForm({
-  submit,
+  cell,
+  afterAction,
 }: {
-  submit: (prevState: State, formData: FormData) => State;
+  cell: CalendarCell;
+  afterAction: () => void;
 }) {
-  const initialState = { message: null };
-  const [state, dispatch] = useFormState(submit, initialState);
+  const initialState: State = { message: null };
+  const [state, dispatch] = useFormState(createEvent, initialState);
+
+  useEffect(() => {
+    if (state.message !== initialState.message) {
+      afterAction();
+    }
+  }, [state]);
 
   return (
     <form
@@ -39,6 +50,8 @@ export default function CreateEventForm({
           placeholder={'Minute'}
         />
       </div>
+      <input type="hidden" value={cell.startsAt} name="startsAt"></input>
+      <input type="hidden" value={cell.endsAt} name="endsAt"></input>
       <button className="btn" type="submit">
         Add event
       </button>

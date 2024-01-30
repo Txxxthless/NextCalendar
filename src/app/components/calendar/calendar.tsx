@@ -1,6 +1,6 @@
 'use client';
 
-import Event from './event';
+import Event, { getEventClass } from './event';
 import './style.scss';
 import {
   generateCalendar,
@@ -14,32 +14,15 @@ import arrowRight from '../../../../public/icons/arrow.svg';
 import { useEffect, useState } from 'react';
 import { CalendarCell, CalendarEvent } from '@/interface/calendar.interface';
 import CreateEventForm, { State } from './create-event-form';
-import { z } from 'zod';
 import Modal from '../modal/modal';
-
-const numberValidator = (min: number, max: number) => {
-  return z.preprocess(
-    (a: unknown) => parseInt(a as string, 10),
-    z.number().min(min).max(max)
-  );
-};
-
-const createEventSchema = z
-  .object({
-    name: z.string(),
-    startHour: numberValidator(0, 24),
-    startMinute: numberValidator(0, 59),
-    endHour: numberValidator(0, 24),
-    endMinute: numberValidator(0, 59),
-  })
-  .refine((schema) => schema.startHour < schema.endHour);
+import { getEvents } from '@/app/actions/calendar.actions';
 
 export default function Calendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
 
   const [cell, setCell] = useState<CalendarCell>({
-    start: '',
-    end: '',
+    startsAt: '',
+    endsAt: '',
     event: null,
   });
 
@@ -61,6 +44,24 @@ export default function Calendar() {
     setCalendar(calendar);
   }, [events, startDate]);
 
+  const requestEvents = () => {
+    getEvents().then(({ rows }) => {
+      const responseEvents = rows.map((event) => {
+        return {
+          id: event.id,
+          startsAt: event.startsat,
+          endsAt: event.endsat,
+          name: event.name,
+        };
+      });
+      setEvents([...events, ...responseEvents]);
+    });
+  };
+
+  useEffect(() => {
+    requestEvents();
+  }, []);
+
   const moveDate = (move: number) => {
     const nextDate = new Date(startDate);
     nextDate.setDate(nextDate.getDate() + move);
@@ -70,7 +71,7 @@ export default function Calendar() {
   };
 
   const modalOpen = (cell: CalendarCell) => {
-    console.log(cell.start, cell.end);
+    console.log(cell.startsAt, cell.endsAt);
     setCell(cell);
     setModalOpen(true);
   };
@@ -111,7 +112,13 @@ export default function Calendar() {
                 className="calendar__main__day__cell"
                 key={index}
                 onClick={() => modalOpen(cell)}
-                style={cell.event ? { border: 'none' } : {}}
+                style={
+                  cell.event &&
+                  getEventClass(cell) !== 'end' &&
+                  getEventClass(cell) !== 'single'
+                    ? { border: 'none' }
+                    : {}
+                }
               >
                 {cell.event ? <Event cell={cell} /> : ''}
               </div>
@@ -122,38 +129,10 @@ export default function Calendar() {
       <Modal isOpen={isModalOpen} close={() => setModalOpen(false)}>
         <p>Create new event</p>
         <CreateEventForm
-          submit={(state: State, formData: FormData) => {
-            const validatedFields = createEventSchema.safeParse({
-              name: formData.get('name'),
-              startHour: formData.get('startHour'),
-              startMinute: formData.get('startMinute'),
-              endHour: formData.get('endHour'),
-              endMinute: formData.get('endMinute'),
-            });
-
-            if (validatedFields.success) {
-              const { name, startHour, startMinute, endHour, endMinute } =
-                validatedFields.data;
-              const start = new Date(cell.start);
-              start.setHours(startHour);
-              start.setMinutes(startMinute);
-              const end = new Date(cell.start);
-              end.setHours(endHour);
-              end.setMinutes(endMinute);
-
-              setEvents([
-                ...events,
-                {
-                  name: name,
-                  start: start.toISOString(),
-                  end: end.toISOString(),
-                },
-              ]);
-
-              setModalOpen(false);
-              return { message: '' };
-            }
-            return { message: 'The input is incorrect' };
+          cell={cell}
+          afterAction={() => {
+            setModalOpen(false);
+            requestEvents();
           }}
         />
       </Modal>

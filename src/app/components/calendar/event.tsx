@@ -2,20 +2,20 @@
 
 import { CalendarCell, CalendarEvent } from '@/interface/calendar.interface';
 
-function getEventClass(cell: CalendarCell) {
+export function getEventClass(cell: CalendarCell) {
   if (!cell.event) {
     return '';
   }
 
-  if (cell.event.start < cell.start && cell.event.end > cell.end) {
+  if (cell.event.startsAt < cell.startsAt && cell.event.endsAt > cell.endsAt) {
     return 'middle';
   }
 
-  if (cell.event.start >= cell.start && cell.event.end <= cell.end) {
+  if (cell.event.startsAt >= cell.startsAt && cell.event.endsAt <= cell.endsAt) {
     return 'single';
   }
 
-  if (cell.event.start >= cell.start) {
+  if (cell.event.startsAt >= cell.startsAt) {
     return 'start';
   }
 
@@ -28,8 +28,8 @@ function getEventStyle(cell: CalendarCell) {
   }
 
   const eventClass = getEventClass(cell);
-  const eventStart = new Date(cell.event.start);
-  const eventEnd = new Date(cell.event.end);
+  const eventStart = new Date(cell.event.startsAt);
+  const eventEnd = new Date(cell.event.endsAt);
 
   if (eventClass === 'start') {
     const eventMinutes = eventStart.getMinutes();

@@ -1,11 +1,12 @@
 export interface CalendarCell {
-  start: string;
-  end: string;
+  startsAt: string;
+  endsAt: string;
   event: CalendarEvent | null;
 }
 
 export interface CalendarEvent {
-  start: string;
-  end: string;
+  startsAt: string;
+  endsAt: string;
   name: string;
+  id: string;
 }
