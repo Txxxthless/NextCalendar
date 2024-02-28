@@ -24,6 +24,7 @@ html {
   body {
     height: 100vh;
     display: flex;
+    position: relative;
 
     .dashboard {
       padding: 50px;
@@ -51,4 +52,25 @@ html {
 
 .page-title {
   font-size: 24px;
+}
+
+.btn {
+  background-color: #0e4c92;
+  color: white;
+  padding: 5px 40px;
+  border-radius: 5px;
+}
+
+input {
+  padding-left: 5px;
+  outline: none;
+  border: 1px solid #0e4c92;
+  border-radius: 5px;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
 }

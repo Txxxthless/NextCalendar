@@ -1,6 +1,6 @@
 'use client';
 
-import Event from './event';
+import Event, { getEventClass } from './event';
 import './style.scss';
 import {
   generateCalendar,
@@ -11,27 +11,69 @@ import {
 import Image from 'next/image';
 
 import arrowRight from '../../../../public/icons/arrow.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { CalendarCell, CalendarEvent } from '@/interface/calendar.interface';
+import CreateEventForm, { State } from './create-event-form';
+import Modal from '../modal/modal';
+import { getEvents } from '@/app/actions/calendar.actions';
 
 export default function Calendar() {
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  const [cell, setCell] = useState<CalendarCell>({
+    startsAt: '',
+    endsAt: '',
+    event: null,
+  });
+
   const [startDate, setStartDate] = useState(getStartDate().toISOString());
   const [calendar, setCalendar] = useState(
-    generateCalendar(new Date(startDate))
+    generateCalendar(new Date(startDate), events)
   );
   const timePeriods = getTimePeriods();
   const [calendarHeaders, setCalendarHeaders] = useState(
     getCalendarHeaders(new Date(startDate))
   );
 
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    const calendar = generateCalendar(new Date(startDate), events);
+    const calendarHeaders = getCalendarHeaders(new Date(startDate));
+    setCalendarHeaders(calendarHeaders);
+    setCalendar(calendar);
+  }, [events, startDate]);
+
+  const requestEvents = () => {
+    getEvents().then(({ rows }) => {
+      const responseEvents = rows.map((event) => {
+        return {
+          id: event.id,
+          startsAt: event.startsat,
+          endsAt: event.endsat,
+          name: event.name,
+        };
+      });
+      setEvents([...events, ...responseEvents]);
+    });
+  };
+
+  useEffect(() => {
+    requestEvents();
+  }, []);
+
   const moveDate = (move: number) => {
     const nextDate = new Date(startDate);
     nextDate.setDate(nextDate.getDate() + move);
+
     const isoString = nextDate.toISOString();
     setStartDate(isoString);
-    const newCalendar = generateCalendar(new Date(isoString));
-    setCalendar(newCalendar);
-    const newHeaders = getCalendarHeaders(new Date(isoString));
-    setCalendarHeaders(newHeaders);
+  };
+
+  const modalOpen = (cell: CalendarCell) => {
+    console.log(cell.startsAt, cell.endsAt);
+    setCell(cell);
+    setModalOpen(true);
   };
 
   return (
@@ -69,15 +111,31 @@ export default function Calendar() {
               <div
                 className="calendar__main__day__cell"
                 key={index}
-                onClick={() => console.log(cell.start, cell.end)}
-                style={cell.event ? { border: 'none' } : {}}
+                onClick={() => modalOpen(cell)}
+                style={
+                  cell.event &&
+                  getEventClass(cell) !== 'end' &&
+                  getEventClass(cell) !== 'single'
+                    ? { border: 'none' }
+                    : {}
+                }
               >
-                {cell.event ? <Event cell={cell}></Event> : ''}
+                {cell.event ? <Event cell={cell} /> : ''}
               </div>
             ))}
           </div>
         ))}
       </div>
+      <Modal isOpen={isModalOpen} close={() => setModalOpen(false)}>
+        <p>Create new event</p>
+        <CreateEventForm
+          cell={cell}
+          afterAction={() => {
+            setModalOpen(false);
+            requestEvents();
+          }}
+        />
+      </Modal>
     </div>
   );
 }

@@ -1,39 +1,11 @@
 import { CalendarCell, CalendarEvent } from '@/interface/calendar.interface';
 
-export const events: CalendarEvent[] = [
-  {
-    start: '2024-01-24T03:35:00.000Z',
-    end: '2024-01-24T05:25:00.000Z',
-    name: 'Event 1',
-  },
-  {
-    start: '2024-01-26T15:30:00.000Z',
-    end: '2024-01-26T16:00:00.000Z',
-    name: 'Event 2',
-  },
-  {
-    start: '2024-01-27T10:21:00.000Z',
-    end: '2024-01-27T12:35:00.000Z',
-    name: 'Event 3',
-  },
-  {
-    start: '2024-01-16T08:30:00.000Z',
-    end: '2024-01-16T10:00:00.000Z',
-    name: 'Event 2',
-  },
-  {
-    start: '2024-02-01T09:21:00.000Z',
-    end: '2024-02-01T12:35:00.000Z',
-    name: 'Event 3',
-  },
-];
-
 export const DAYS_COUNT = 7;
 export const PERIODS_COUNT = 48;
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export function generateCalendar(date: Date) {
+export function generateCalendar(date: Date, events: CalendarEvent[]) {
   let calendarDays: CalendarCell[][] = [];
 
   for (let i = 0; i < DAYS_COUNT; i++) {
@@ -47,8 +19,8 @@ export function generateCalendar(date: Date) {
       const event = findRelatedEvent(start, end, events);
 
       day[j] = {
-        start: start,
-        end: end,
+        startsAt: start,
+        endsAt: end,
         event: event,
       };
     }
@@ -103,8 +75,8 @@ export function findRelatedEvent(
   const periodEnd = new Date(end);
 
   for (let event of events) {
-    const eventStart = new Date(event.start);
-    const eventEnd = new Date(event.end);
+    const eventStart = new Date(event.startsAt);
+    const eventEnd = new Date(event.endsAt);
 
     eventStart.getMinutes() < 30
       ? eventStart.setMinutes(0)
